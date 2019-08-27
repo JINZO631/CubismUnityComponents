@@ -23,7 +23,8 @@ namespace Live2D.Cubism.Framework.MotionFade
         /// <summary>
         /// Register fadeMotion importer.
         /// </summary>
-        [InitializeOnLoadMethod]
+        // [InitializeOnLoadMethod]
+        // 不要なので切っておく
         private static void RegisterMotionImporter()
         {
             CubismImporter.OnDidImportMotion += OnFadeMotionImport;
@@ -94,7 +95,7 @@ namespace Live2D.Cubism.Framework.MotionFade
 
 
             var instanceId = animationClip.GetInstanceID();
-            var motionIndex =  Array.IndexOf(fadeMotions.MotionInstanceIds, instanceId);
+            var motionIndex = Array.IndexOf(fadeMotions.MotionInstanceIds, instanceId);
             if (motionIndex != -1)
             {
                 fadeMotions.CubismFadeMotionObjects[motionIndex] = fadeMotion;
@@ -103,10 +104,10 @@ namespace Live2D.Cubism.Framework.MotionFade
             {
                 motionIndex = fadeMotions.MotionInstanceIds.Length;
 
-                Array.Resize(ref fadeMotions.MotionInstanceIds, motionIndex+1);
+                Array.Resize(ref fadeMotions.MotionInstanceIds, motionIndex + 1);
                 fadeMotions.MotionInstanceIds[motionIndex] = instanceId;
 
-                Array.Resize(ref fadeMotions.CubismFadeMotionObjects, motionIndex+1);
+                Array.Resize(ref fadeMotions.CubismFadeMotionObjects, motionIndex + 1);
                 fadeMotions.CubismFadeMotionObjects[motionIndex] = fadeMotion;
             }
 
@@ -117,9 +118,9 @@ namespace Live2D.Cubism.Framework.MotionFade
                 var sourceAnimationEvents = AnimationUtility.GetAnimationEvents(animationClip);
                 var index = -1;
 
-                for(var i = 0; i < sourceAnimationEvents.Length; ++i)
+                for (var i = 0; i < sourceAnimationEvents.Length; ++i)
                 {
-                    if(sourceAnimationEvents[i].functionName != "InstanceId")
+                    if (sourceAnimationEvents[i].functionName != "InstanceId")
                     {
                         continue;
                     }
@@ -128,7 +129,7 @@ namespace Live2D.Cubism.Framework.MotionFade
                     break;
                 }
 
-                if(index == -1)
+                if (index == -1)
                 {
                     index = sourceAnimationEvents.Length;
                     Array.Resize(ref sourceAnimationEvents, sourceAnimationEvents.Length + 1);
