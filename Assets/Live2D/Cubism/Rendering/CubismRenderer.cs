@@ -92,19 +92,19 @@ namespace Live2D.Cubism.Rendering
         {
             get
             {
-                #if UNITY_EDITOR
+#if UNITY_EDITOR
                 if (!Application.isPlaying)
                 {
                     return MeshRenderer.sharedMaterial;
                 }
-                #endif
+#endif
 
 
                 return MeshRenderer.material;
             }
             set
             {
-                #if UNITY_EDITOR
+#if UNITY_EDITOR
                 if (!Application.isPlaying)
                 {
                     MeshRenderer.sharedMaterial = value;
@@ -112,7 +112,7 @@ namespace Live2D.Cubism.Rendering
 
                     return;
                 }
-                #endif
+#endif
 
 
                 MeshRenderer.material = value;
@@ -315,8 +315,8 @@ namespace Live2D.Cubism.Rendering
         /// Allows tracking of what vertex data will be swapped.
         /// </summary>
         private SwapInfo ThisSwap { get; set; }
-        
-        
+
+
         /// <summary>
         /// Swaps mesh buffers.
         /// </summary>
@@ -335,14 +335,14 @@ namespace Live2D.Cubism.Rendering
 
             // Update colors.
             Meshes[BackMesh].colors = VertexColors;
-            
-            
+
+
             // Update swap info.
             LastSwap = ThisSwap;
 
 
             ResetSwapInfoFlags();
-            
+
 
             // Apply swap.
 #if UNITY_EDITOR
@@ -377,8 +377,8 @@ namespace Live2D.Cubism.Rendering
 
             ResetVisibilityFlags();
         }
-        
-        
+
+
         /// <summary>
         /// Updates render order. 
         /// </summary>
@@ -389,7 +389,7 @@ namespace Live2D.Cubism.Rendering
                 ApplySorting();
             }
 
-            
+
             ResetRenderOrderFlag();
         }
 
@@ -599,6 +599,10 @@ namespace Live2D.Cubism.Rendering
                     ? -DepthOffset
                     : DepthOffset;
 
+#if UNITY_EDITOR
+            // Import -> ScriptからのSortingOrder設定時に_meshRendererが初期化されていないのでここでGetComponentする
+            _meshRenderer = GetComponent<MeshRenderer>();
+#endif
 
             MeshRenderer.sortingOrder = SortingOrder + LocalSortingOrder;
 
@@ -720,7 +724,7 @@ namespace Live2D.Cubism.Rendering
         private void TryInitializeVertexColor()
         {
             var mesh = Mesh;
-            
+
 
             VertexColors = new Color[mesh.vertexCount];
 
@@ -745,8 +749,8 @@ namespace Live2D.Cubism.Rendering
 
             ApplyMainTexture();
         }
-        
-        
+
+
         /// <summary>
         /// Initializes components if possible.
         /// </summary>
@@ -764,7 +768,7 @@ namespace Live2D.Cubism.Rendering
         }
 
         #region Swap Info
-        
+
         /// <summary>
         /// Sets <see cref="NewVertexPositions"/>.
         /// </summary>
@@ -807,7 +811,7 @@ namespace Live2D.Cubism.Rendering
             swapInfo.DidBecomeInvisible = true;
             ThisSwap = swapInfo;
         }
-        
+
 
         /// <summary>
         /// Sets <see cref="SetNewRenderOrder"/>.
@@ -818,8 +822,8 @@ namespace Live2D.Cubism.Rendering
             swapInfo.NewRenderOrder = true;
             ThisSwap = swapInfo;
         }
-        
-        
+
+
         /// <summary>
         /// Resets flags.
         /// </summary>
@@ -832,7 +836,7 @@ namespace Live2D.Cubism.Rendering
             swapInfo.DidBecomeInvisible = false;
             ThisSwap = swapInfo;
         }
-        
+
 
         /// <summary>
         /// Reset visibility flags.
@@ -844,8 +848,8 @@ namespace Live2D.Cubism.Rendering
             swapInfo.DidBecomeInvisible = false;
             LastSwap = swapInfo;
         }
-        
-        
+
+
         /// <summary>
         /// Reset render order flag.
         /// </summary>
@@ -855,8 +859,8 @@ namespace Live2D.Cubism.Rendering
             swapInfo.NewRenderOrder = false;
             LastSwap = swapInfo;
         }
-        
-        
+
+
         /// <summary>
         /// Allows tracking of <see cref="Mesh"/> data changed on a swap.
         /// </summary>
@@ -871,7 +875,7 @@ namespace Live2D.Cubism.Rendering
             /// Vertex colors were changed.
             /// </summary>
             public bool NewVertexColors { get; set; }
-            
+
             /// <summary>
             /// Visibility were changed to visible.
             /// </summary>
@@ -881,7 +885,7 @@ namespace Live2D.Cubism.Rendering
             /// Visibility were changed to invisible.
             /// </summary>
             public bool DidBecomeInvisible { get; set; }
-            
+
             /// <summary>
             /// Render order were changed.
             /// </summary>
