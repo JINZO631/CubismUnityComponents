@@ -6,17 +6,16 @@
  */
 
 
-using Live2D.Cubism.Editor.Deleters;
-using Live2D.Cubism.Editor.Importers;
 using Live2D.Cubism.Rendering;
 using Live2D.Cubism.Rendering.Masking;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
+using Live2D.Cubism.Editor.Importers;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
-
+using Live2D.Cubism.Editor.Deleters;
 
 namespace Live2D.Cubism.Editor
 {
@@ -216,25 +215,32 @@ namespace Live2D.Cubism.Editor
         /// <summary>
         /// Generates the builtin resources as necessary.
         /// </summary>
-        private static void GenerateBuiltinResources()
+		private static void GenerateBuiltinResources()
         {
-            var resourcesRoot = AssetDatabase
-                .GetAssetPath(CubismBuiltinShaders.Unlit)
-                .Replace("/Shaders/Unlit.shader", "");
+            var detectedLive2DFolderPath = GetTargetFolderPath("Live2D", "Assets/");
 
-
-            // Create materials.
-            if (CubismBuiltinMaterials.Mask == null)
+            if (string.IsNullOrEmpty(detectedLive2DFolderPath))
             {
-                var materialsRoot = resourcesRoot + "/Materials";
+                Debug.LogError("failed to find Live2D installed folder.");
+                return;
+            }
 
+            var resourcePath = Path.Combine(detectedLive2DFolderPath, "Cubism/Rendering/Resources/Live2D/Cubism");
 
-                // Make sure materials folder exists.
-                if (!Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), materialsRoot)))
-                {
-                    Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), materialsRoot));
-                }
+            if (!Directory.Exists(resourcePath))
+            {
+                Debug.Log("failed to detect Resources folder path.");
+                return;
+            }
 
+            // create materials if need.
+            var materialsPath = Path.Combine(resourcePath, "Materials");
+            if (!Directory.Exists(materialsPath))
+            {
+                // create Materials folder.
+                Directory.CreateDirectory(materialsPath);
+
+                Debug.Log("フォルダ作った。 resourcePath:" + resourcePath);
 
                 // Create mask material.
                 var material = new Material(CubismBuiltinShaders.Mask)
@@ -242,8 +248,7 @@ namespace Live2D.Cubism.Editor
                     name = "Mask"
                 };
 
-
-                AssetDatabase.CreateAsset(material, string.Format("{0}/{1}.mat", materialsRoot, material.name));
+                AssetDatabase.CreateAsset(material, Path.Combine(materialsPath, material.name) + ".mat");
 
 
                 // Create non-masked materials.
@@ -253,7 +258,7 @@ namespace Live2D.Cubism.Editor
                 };
 
                 EnableNormalBlending(material);
-                AssetDatabase.CreateAsset(material, string.Format("{0}/{1}.mat", materialsRoot, material.name));
+                AssetDatabase.CreateAsset(material, Path.Combine(materialsPath, material.name) + ".mat");
 
 
                 material = new Material(CubismBuiltinShaders.Unlit)
@@ -262,7 +267,7 @@ namespace Live2D.Cubism.Editor
                 };
 
                 EnableAdditiveBlending(material);
-                AssetDatabase.CreateAsset(material, string.Format("{0}/{1}.mat", materialsRoot, material.name));
+                AssetDatabase.CreateAsset(material, Path.Combine(materialsPath, material.name) + ".mat");
 
 
                 material = new Material(CubismBuiltinShaders.Unlit)
@@ -271,7 +276,7 @@ namespace Live2D.Cubism.Editor
                 };
 
                 EnableMultiplicativeBlending(material);
-                AssetDatabase.CreateAsset(material, string.Format("{0}/{1}.mat", materialsRoot, material.name));
+                AssetDatabase.CreateAsset(material, Path.Combine(materialsPath, material.name) + ".mat");
 
 
                 // Create masked materials.
@@ -282,7 +287,7 @@ namespace Live2D.Cubism.Editor
 
                 EnableNormalBlending(material);
                 EnableMasking(material);
-                AssetDatabase.CreateAsset(material, string.Format("{0}/{1}.mat", materialsRoot, material.name));
+                AssetDatabase.CreateAsset(material, Path.Combine(materialsPath, material.name) + ".mat");
 
 
                 material = new Material(CubismBuiltinShaders.Unlit)
@@ -292,7 +297,7 @@ namespace Live2D.Cubism.Editor
 
                 EnableAdditiveBlending(material);
                 EnableMasking(material);
-                AssetDatabase.CreateAsset(material, string.Format("{0}/{1}.mat", materialsRoot, material.name));
+                AssetDatabase.CreateAsset(material, Path.Combine(materialsPath, material.name) + ".mat");
 
 
                 material = new Material(CubismBuiltinShaders.Unlit)
@@ -302,24 +307,63 @@ namespace Live2D.Cubism.Editor
 
                 EnableMultiplicativeBlending(material);
                 EnableMasking(material);
-                AssetDatabase.CreateAsset(material, string.Format("{0}/{1}.mat", materialsRoot, material.name));
+                AssetDatabase.CreateAsset(material, Path.Combine(materialsPath, material.name) + ".mat");
 
 
                 EditorUtility.SetDirty(CubismBuiltinShaders.Unlit);
                 AssetDatabase.SaveAssets();
             }
 
-
             // Create global mask texture.
-            if (CubismMaskTexture.GlobalMaskTexture == null)
+            var globalMaskTexture = ScriptableObject.CreateInstance<CubismMaskTexture>();
+            if (globalMaskTexture == null)
             {
-                var globalMaskTexture = ScriptableObject.CreateInstance<CubismMaskTexture>();
-
-                globalMaskTexture.name = "GlobalMaskTexture";
-
-
-                AssetDatabase.CreateAsset(globalMaskTexture, string.Format("{0}/{1}.asset", resourcesRoot, globalMaskTexture.name));
+                Debug.LogError("failed to load CubismMaskTexture");
+                return;
             }
+
+            var targetAssetPath = Path.Combine(resourcePath, "GlobalMaskTexture") + ".asset";
+            if (!File.Exists(targetAssetPath))
+            {
+                AssetDatabase.CreateAsset(globalMaskTexture, targetAssetPath);
+            }
+        }
+
+        private static string GetTargetFolderPath(string targetFolderName, string findStartPath)
+        {
+            var childDirectoryPaths = Directory.GetDirectories(findStartPath);
+
+            return FindRecursive(targetFolderName, childDirectoryPaths);
+        }
+
+        private static string FindRecursive(string targetFolderName, string[] paths)
+        {
+            foreach (var dirPath in paths)
+            {
+                // チェックを行う
+                if (dirPath.Contains(targetFolderName))
+                {
+                    return dirPath;
+                }
+
+                // まだパスに欲しいフォルダ名が含まれていない。
+
+                // 下の階層があるかチェック
+                var child2 = Directory.GetDirectories(dirPath);
+                if (child2.Length == 0)
+                {
+                    continue;
+                }
+
+                // 下の階層があるので、読み込み
+                var result = FindRecursive(targetFolderName, child2);
+                if (!string.IsNullOrEmpty(result))
+                {
+                    return result;
+                }
+            }
+
+            return string.Empty;
         }
 
         #endregion
