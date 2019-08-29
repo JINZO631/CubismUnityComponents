@@ -8,7 +8,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e0a054ada4fee4941bb861f4449e9623, type: 3}
+  m_Script: {fileID: 11500000, guid: 31ff3efcbb9c7bd4a8ce70612679b822, type: 3}
   m_Name: OriginalWorkflowSettings
   m_EditorClassIdentifier: 
   ShouldImportAsOriginalWorkflow: 0
