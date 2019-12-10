@@ -63,11 +63,13 @@ namespace Live2D.Cubism.Core
         [MonoPInvokeCallback(typeof(UnmanagedLogDelegate))]
         private static unsafe void LogUnmanaged(char* message)
         {
+#if UNITY_EDITOR
             // Marshal message and log it.
             var managedMessage = Marshal.PtrToStringAnsi(new IntPtr(message));
 
 
             Debug.LogFormat("[Cubism] Core: {0}.", managedMessage);
+#endif
         }
 
         #region Extern C
