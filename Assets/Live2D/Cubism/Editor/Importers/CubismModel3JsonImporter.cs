@@ -161,6 +161,13 @@ namespace Live2D.Cubism.Editor.Importers
         /// </summary>
         public override void Import()
         {
+            if (System.IO.File.Exists(Application.dataPath + AssetPath.Replace(".model3.json", ".prefab").Substring("Assets".Length)))
+            {
+                // すでにprefabが存在している状態でimportが走るとnull参照が出るのでimportを無視する(2019.2.18f1)
+                // prefab上書きはできなくなるが使わないので問題ない
+                return;
+            }
+
             var isImporterDirty = false;
 
 
@@ -215,7 +222,7 @@ namespace Live2D.Cubism.Editor.Importers
 
                 CopyUserData(source, model);
                 Object.DestroyImmediate(source.gameObject, true);
-                
+
 
                 // Trigger events.
                 CubismImporter.SendModelImportEvent(this, model);
@@ -290,7 +297,7 @@ namespace Live2D.Cubism.Editor.Importers
                 }
 
                 // skip copy original workflow component.
-                if(sourceComponent.GetType() == typeof(CubismUpdateController)
+                if (sourceComponent.GetType() == typeof(CubismUpdateController)
                 || sourceComponent.GetType() == typeof(CubismMotionController)
                 || sourceComponent.GetType() == typeof(CubismFadeController)
                 || sourceComponent.GetType() == typeof(CubismExpressionController)
