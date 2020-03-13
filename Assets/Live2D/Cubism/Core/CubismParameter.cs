@@ -128,7 +128,11 @@ namespace Live2D.Cubism.Core
         /// <summary>
         /// Current value.
         /// </summary>
+#if CUBISM_EDIT
+        [SerializeField]
+#else
         [SerializeField, HideInInspector]
+#endif
         public float Value;
 
 

@@ -25,6 +25,7 @@ namespace Live2D.Cubism.Editor.Inspectors
         /// <summary>
         /// Draws the inspector.
         /// </summary>
+#if !CUBISM_EDIT
         public override void OnInspectorGUI()
         {
             // Lazily initialize.
@@ -42,14 +43,12 @@ namespace Live2D.Cubism.Editor.Inspectors
             {
                 EditorGUI.BeginChangeCheck();
 
-
                 parameter.Value = EditorGUILayout.Slider(
                     parameter.Id,
                     parameter.Value,
                     parameter.MinimumValue,
                     parameter.MaximumValue
                     );
-
 
                 if (EditorGUI.EndChangeCheck())
                 {
@@ -66,7 +65,7 @@ namespace Live2D.Cubism.Editor.Inspectors
 
 
             resetPosition.width *= 0.25f;
-            resetPosition.x += (resetPosition.width*3f);
+            resetPosition.x += (resetPosition.width * 3f);
 
 
             if (GUI.Button(resetPosition, "Reset"))
@@ -83,7 +82,7 @@ namespace Live2D.Cubism.Editor.Inspectors
                 didParametersChange = true;
             }
 
-            
+
             if (didParametersChange)
             {
                 (target as Component)
@@ -91,6 +90,7 @@ namespace Live2D.Cubism.Editor.Inspectors
                     .ForceUpdateNow();
             }
         }
+#endif
 
         #endregion
 

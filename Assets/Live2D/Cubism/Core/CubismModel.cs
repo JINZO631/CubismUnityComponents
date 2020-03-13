@@ -229,7 +229,7 @@ namespace Live2D.Cubism.Core
                 return;
             }
 
-        
+
             // Return if revive isn't possible.
             if (!CanRevive)
             {
@@ -337,10 +337,13 @@ namespace Live2D.Cubism.Core
 
 
             // Sync parameters back.
+#if CUBISM_EDIT
+#else
             TaskableModel.TryReadParameters(Parameters);
+#endif
 
             // restore last frame parameters value and parts opacity.
-            if(_parameterStore != null)
+            if (_parameterStore != null)
             {
                 _parameterStore.RestoreParameters();
             }
@@ -354,6 +357,13 @@ namespace Live2D.Cubism.Core
 
             OnDynamicDrawableData(this, TaskableModel.DynamicDrawableData);
         }
+
+#if CUBISM_EDIT
+        private void LateUpdate()
+        {
+            ForceUpdateNow();
+        }
+#endif
 
 
         /// <summary>
@@ -448,6 +458,6 @@ namespace Live2D.Cubism.Core
             OnEnable();
         }
 
-#endregion
+        #endregion
     }
 }

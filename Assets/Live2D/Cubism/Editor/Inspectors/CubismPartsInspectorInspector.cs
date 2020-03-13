@@ -25,6 +25,7 @@ namespace Live2D.Cubism.Editor.Inspectors
         /// <summary>
         /// Draws the inspector.
         /// </summary>
+#if !CUBISM_EDIT
         public override void OnInspectorGUI()
         {
             // Lazily initialize.
@@ -42,14 +43,12 @@ namespace Live2D.Cubism.Editor.Inspectors
             {
                 EditorGUI.BeginChangeCheck();
 
-
                 part.Opacity = EditorGUILayout.Slider(
                     part.Id,
                     part.Opacity,
                     0f,
                     1f
                     );
-
 
                 if (EditorGUI.EndChangeCheck())
                 {
@@ -69,6 +68,7 @@ namespace Live2D.Cubism.Editor.Inspectors
                     .ForceUpdateNow();
             }
         }
+#endif
 
         #endregion
 

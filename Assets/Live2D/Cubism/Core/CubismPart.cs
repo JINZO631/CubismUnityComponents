@@ -53,8 +53,8 @@ namespace Live2D.Cubism.Core
         }
 
         #endregion
-        
-        
+
+
         /// <summary>
         /// Unmanaged parts from unmanaged model.
         /// </summary>
@@ -92,7 +92,11 @@ namespace Live2D.Cubism.Core
         /// <summary>
         /// Current opacity.
         /// </summary>
+#if CUBISM_EDIT
+        [SerializeField]
+#else
         [SerializeField, HideInInspector]
+#endif
         public float Opacity;
 
 
